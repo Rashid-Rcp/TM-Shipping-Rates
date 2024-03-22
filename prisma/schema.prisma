@@ -1,0 +1,39 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = "file:dev.sqlite"
+}
+
+model Session {
+  id          String    @id
+  shop        String
+  state       String
+  isOnline    Boolean   @default(false)
+  scope       String?
+  expires     DateTime?
+  accessToken String
+  userId      BigInt?
+}
+
+model ShippingRates {
+  id             Int      @id @default(autoincrement())
+  service_name   String
+  service_code   String
+  total_price    Float
+  description    String
+  currency       String
+  pincodes       Pincodes[]
+}
+
+model Pincodes {
+  id                 Int      @id @default(autoincrement())
+  shipping_rate      ShippingRates @relation(fields: [shipping_rate_id], references: [id])
+  shipping_rate_id   Int
+  pincode            String
+}
