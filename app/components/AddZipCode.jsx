@@ -1,6 +1,7 @@
-import { Layout, Card, Text, TextField, Button, InlineStack,BlockStack, Divider } from "@shopify/polaris";
-import { useState, useCallback, useEffect } from 'react';
+import { Layout, Card, Text, Button, InlineStack,BlockStack, Divider } from "@shopify/polaris";
+import { useState, useEffect } from 'react';
 import { useNavigation } from "@remix-run/react";
+import ZipCodeForm from "./ZipCodeForm";
 
 export default function AddZipCode(props) {
 
@@ -26,6 +27,15 @@ export default function AddZipCode(props) {
     price: rates ? (rates[0]?.total_price ?? '') : '',
     priceValid: rates ? (rates[0]?.total_price !== '' ? true : false) : false,
     priceMessage: '',
+    phoneRequired: rates ? (rates[0]?.phone_required ?? false) : false,
+    phoneRequiredValid: true,
+    phoneRequiredMessge:'',
+    minDeliveryDays: rates ? (rates[0]?.min_delivery_days ?? '') : '',
+    minDeliveryDaysValid: rates ? (rates[0]?.min_delivery_days !== '' ? true : false) : false,
+    minDeliveryDaysMessage: '',
+    maxDeliveryDays: rates ? (rates[0]?.max_delivery_days ?? '') : '',
+    maxDeliveryDaysValid: rates ? (rates[0]?.max_delivery_days !== '' ? true : false) : false,
+    maxDeliveryDaysMessage: '',
     id: rates ? (rates[0]?.id ?? '') : '',
   });
   
@@ -48,6 +58,15 @@ export default function AddZipCode(props) {
     price: rates ? (rates[1]?.total_price ?? '') : '',
     priceValid: rates ? (rates[1]?.total_price !== '' ? true : false) : false,
     priceMessage: '',
+    phoneRequired: rates ? (rates[1]?.phone_required ?? false) : false,
+    phoneRequiredValid: true,
+    phoneRequiredMessge:'',
+    minDeliveryDays: rates ? (rates[1]?.min_delivery_days ?? '') : '',
+    minDeliveryDaysValid: rates ? (rates[1]?.min_delivery_days !== '' ? true : false) : false,
+    minDeliveryDaysMessage: '',
+    maxDeliveryDays: rates ? (rates[1]?.max_delivery_days ?? '') : '',
+    maxDeliveryDaysValid: rates ? (rates[1]?.max_delivery_days !== '' ? true : false) : false,
+    maxDeliveryDaysMessage: '',
     id: rates ? (rates[1]?.id ?? '') : '',
   });
 
@@ -56,64 +75,28 @@ export default function AddZipCode(props) {
   useEffect(()=>{
     nav.state !== 'idle' &&  setIsLoading(false);
   },[nav]);
-  
-  const handleFieldChange = useCallback((setRate, fieldName, newValue) => {
-
-    let {isValid, message} = doFieldValidation(fieldName, newValue);
-    setRate(prevRate => ({
-      ...prevRate,
-      [fieldName]: newValue,
-      [`${fieldName}Valid`]: isValid,
-      [`${fieldName}Message`]: message,
-    }));
-
-  }, []);
-
-  const doFieldValidation = (fieldName, newValue) => {
-    let isValid = true;
-    let message = '';
-  
-    if (newValue.trim() === '') {
-      message = `${fieldName} can't be empty`;
-      isValid = false;
-    } else if (fieldName === 'price' && isNaN(newValue.trim())) {
-      message = 'Price must be a number';
-      isValid = false;
-    } else if (fieldName === 'currency' && !isValidCurrencyCode(newValue.trim())) {
-      message = 'Invalid currency code';
-      isValid = false;
-    }
-  
-    return { isValid, message };
-  };
-
-  const isValidCurrencyCode = (currencyCode) => {
-    const currencyCodeRegex = /^[A-Z]{3}$/;
-    return currencyCodeRegex.test(currencyCode);
-  };
-  
-
+ 
   const [formInvalidMessage, setFormInvalidMessage] = useState('');
 
   const updateShippingRates = ()=>{
 
     const isValid = doFormValidation();
     if(!isValid){
-      setFormInvalidMessage('Please fill the requried filed with valid inputs');
-      setTimeout(function(){
-        setFormInvalidMessage('');
-      },3000);
+      showFormValidationMessaage('Please fill the requried filed with valid inputs');
       return false;
     }
 
     const {pincodes1, pincodes2, duplicated} = isPincodeDuplicated(rate1.pincodes, rate2.pincodes);
     if(duplicated !== ''){
-      setFormInvalidMessage(`Duplicated pincodes found in Shipping rate 2 and Shipping rate 2 [${duplicated}]`);
-      setTimeout(function(){
-        setFormInvalidMessage('');
-      },3000);
+      showFormValidationMessaage(`Duplicated pincodes found in Shipping rate 2 and Shipping rate 2 [${duplicated}]`);
       return false;
     }
+
+   const{ DeliveryDaysValid, message } = isDeliveryDaysValid(rate1, rate2);
+   if(!DeliveryDaysValid){
+      showFormValidationMessaage(message)
+      return false;
+   }
 
     const _rate1 = {
       'id':rate1.id,
@@ -122,7 +105,10 @@ export default function AddZipCode(props) {
       'description': rate1.description,
       'currency': rate1.currency,
       'pincodes': pincodes1,
-      'total_price': rate1.price
+      'total_price': rate1.price,
+      'phone_required' : rate1.phoneRequired,
+      'min_delivery_days': rate1.minDeliveryDays,
+      'max_delivery_days': rate1.maxDeliveryDays
     }
     const _rate2 = {
       'id':rate2.id,
@@ -131,12 +117,33 @@ export default function AddZipCode(props) {
       'description': rate2.description,
       'currency': rate2.currency,
       'pincodes': pincodes2,
-      'total_price': rate2.price
+      'total_price': rate2.price,
+      'phone_required' : rate2.phoneRequired,
+      'min_delivery_days': rate2.minDeliveryDays,
+      'max_delivery_days': rate2.maxDeliveryDays
     }
 
     submit({ rate1: JSON.stringify(_rate1), rate2:JSON.stringify(_rate2), action:'update_rates' }, { method: "POST" });
     setIsLoading(true);
   };
+
+const isDeliveryDaysValid = (rate1, rate2)=>{
+    let isValid = true;
+    let message = "";
+    if(rate1.minDeliveryDays && rate1.maxDeliveryDays){
+      if(rate1.minDeliveryDays >= rate1.maxDeliveryDays){
+        isValid = false;
+        message += "Min devilery days must lessthan max delivery date for shipping rate 1";
+      }
+    }
+    if(rate2.minDeliveryDays && rate2.maxDeliveryDays){
+      if(rate2.minDeliveryDays >= rate2.maxDeliveryDays){
+        isValid = false;
+        message += "\n Min devilery days must lessthan max delivery date for shipping rate 2";
+      }
+    }
+    return{DeliveryDaysValid:isValid, message:message}
+}
 
   const doFormValidation = () => {
     let isValid = true;
@@ -144,7 +151,9 @@ export default function AddZipCode(props) {
     if (!rate1.serviceNameValid || !rate1.serviceCodeValid || !rate1.pincodesValid || 
         !rate1.descriptionValid || !rate1.currencyValid || !rate1.priceValid ||
         !rate2.serviceNameValid || !rate2.serviceCodeValid || !rate2.pincodesValid || 
-        !rate2.descriptionValid || !rate2.currencyValid || !rate2.priceValid
+        !rate2.descriptionValid || !rate2.currencyValid || !rate2.priceValid ||
+        !rate1.maxDeliveryDaysValid || !rate1.minDeliveryDaysValid ||
+        !rate2.maxDeliveryDaysValid || !rate2.minDeliveryDaysValid
       ) {
       isValid = false;
     }  
@@ -162,6 +171,13 @@ export default function AddZipCode(props) {
       return {pincodes1:_pincodes1 , pincodes2:_pincodes2, duplicated:duplicatedPincodes.join(',') };
 };
 
+const showFormValidationMessaage = (message)=>{
+  setFormInvalidMessage(message);
+  setTimeout(function(){
+    setFormInvalidMessage('');
+  },3000);
+}
+
   return (
     <BlockStack gap="500">
         <Layout>
@@ -177,99 +193,12 @@ export default function AddZipCode(props) {
                   <Text as="h4" variant="headingMd">
                    Shipping Rates 1
                   </Text>
-                  <TextField
-                    label="Service Name"
-                    value={rate1.serviceName}
-                    onChange={(value) => handleFieldChange(setRate1, 'serviceName', value)}
-                    autoComplete="off"
-                    error={rate1.serviceNameMessage}
-                  />
-                  <TextField
-                    label="Service Code"
-                    value={rate1.serviceCode}
-                    onChange={(value) => handleFieldChange(setRate1, 'serviceCode', value)}
-                    autoComplete="off"
-                    error={rate1.serviceCodeMessage}
-                  />  
-                  <TextField
-                    label="Pincodes"
-                    value={rate1.pincodes}
-                    onChange={(value) => handleFieldChange(setRate1, 'pincodes', value)}
-                    multiline={4}
-                    autoComplete="off"
-                    helpText="Add pincode as comma separeated"
-                    error={rate1.pincodesMessage}
-                  /> <TextField
-                    label="Description"
-                    value={rate1.description}
-                    onChange={(value) => handleFieldChange(setRate1, 'description', value)}
-                    multiline={2}
-                    autoComplete="off"
-                    error={rate1.description1Change}
-                  /> <TextField
-                    label="Currency"
-                    value={rate1.currency}
-                    onChange={(value) => handleFieldChange(setRate1, 'currency', value)}
-                    autoComplete="off"
-                    error={rate1.currencyMessage}
-                  />
-                  <TextField
-                    label="Price"
-                    value={rate1.price}
-                    onChange={(value) => handleFieldChange(setRate1, 'price', value)}
-                    autoComplete="off"
-                    error={rate1.priceMessage}
-                  />
+                  <ZipCodeForm setRate={setRate1} rates={rate1} />
                   <Divider/>
                   <Text as="h4" variant="headingMd">
                    Shipping Rates 2
                   </Text>
-                  <TextField
-                    label="Service Name"
-                    value={rate2.serviceName}
-                    onChange={(value) => handleFieldChange(setRate2, 'serviceName', value)}
-                    autoComplete="off"
-                    error={rate2.serviceNameMessage}
-                  />
-                  <TextField
-                    label="Service Code"
-                    value={rate2.serviceCode}
-                    onChange={(value) => handleFieldChange(setRate2, 'serviceCode', value)}
-                    autoComplete="off"
-                    error={rate2.serviceCodeMessage}
-                  />
-                  <TextField
-                    label="Pincodes"
-                    value={rate2.pincodes}
-                    onChange={(value) => handleFieldChange(setRate2, 'pincodes', value)}
-                    multiline={4}
-                    autoComplete="off"
-                    helpText="Add pincode as comma separeated"
-                    error={rate2.pincodesMessage}
-                  />
-                   <TextField
-                    label="Description"
-                    value={rate2.description}
-                    onChange={(value) => handleFieldChange(setRate2, 'description', value)}
-                    multiline={2}
-                    autoComplete="off"
-                    error={rate2.descriptionMessage}
-                  />
-                  <TextField
-                    label="Currency"
-                    value={rate2.currency}
-                    onChange={(value) => handleFieldChange(setRate2, 'currency', value)}
-                    autoComplete="off"
-                    error={rate2.currencyMessage}
-                  />
-                  <TextField
-                    label="Price"
-                    value={rate2.price}
-                    onChange={(value) => handleFieldChange(setRate2, 'price', value)}
-                    autoComplete="off"
-                    error={rate2.priceMessage}
-                  />
-
+                  <ZipCodeForm setRate={setRate2} rates={rate2} />
                 </BlockStack>
                 {
                   formInvalidMessage !== '' && (<p style={{color:'red'}}>{formInvalidMessage}</p>)

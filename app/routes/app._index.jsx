@@ -51,9 +51,10 @@ export const action = async ({ request }) => {
         actionMessage = 'Shipping rates updated';
       }
       else {
+        const callback_url = process.env.SHOPIFY_APP_URL + '/shipping_rates'
         const carrier_service = new admin.rest.resources.CarrierService({session: session});
         carrier_service.name = body.get('name');
-        carrier_service.callback_url = "https://alfred-lp-locate-potential.trycloudflare.com/shipping_rates";
+        carrier_service.callback_url = callback_url;
         carrier_service.service_discovery = true;
         response = await carrier_service.save({
           update: true,
@@ -64,9 +65,11 @@ export const action = async ({ request }) => {
     }
 
     case "PUT": {
+      const callback_url = process.env.SHOPIFY_APP_URL + '/shipping_rates'
       const carrier_service = new admin.rest.resources.CarrierService({session: session});
       carrier_service.id = body.get('id');
       carrier_service.name = body.get('name');
+      carrier_service.callback_url = callback_url;
       response = await carrier_service.save({
         update: true,
       });
@@ -104,6 +107,9 @@ const shippingInsertRates = async (rates) => {
       total_price: Number(rates.total_price),
       description: rates.description,
       currency: rates.currency,
+      phone_required: rates.phone_required,
+      max_delivery_days: rates.max_delivery_days!==''? Number(rates.max_delivery_days):null,
+      min_delivery_days: rates.min_delivery_days!==''? Number(rates.min_delivery_days):null,
       pincodes: {
         create: pincodeArray
       }
@@ -132,7 +138,10 @@ const shippingUpdateRates = async (rates) => {
       service_code: rates.service_code,
       total_price: Number(rates.total_price),
       description: rates.description,
-      currency: rates.currency
+      currency: rates.currency,
+      phone_required: rates.phone_required,
+      max_delivery_days: rates.max_delivery_days!==''?Number(rates.max_delivery_days):null,
+      min_delivery_days: rates.min_delivery_days!==''?Number(rates.min_delivery_days):null,
     }
   });
 

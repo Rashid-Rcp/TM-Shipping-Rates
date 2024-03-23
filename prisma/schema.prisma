@@ -28,6 +28,9 @@ model ShippingRates {
   total_price    Float
   description    String
   currency       String
+  phone_required Boolean @default(false)
+  min_delivery_days Int?
+  max_delivery_days Int?
   pincodes       Pincodes[]
 }
 
