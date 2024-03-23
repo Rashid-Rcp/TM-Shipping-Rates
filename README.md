@@ -1,6 +1,6 @@
 # Shopify App For Custom shipping rates based on pincode 
 
-This App will provides you the provision to add 2 differnt type of shipping rates based on pincodes.
+This app provides you with the ability to add two different types of shipping rates based on pin codes
 
 ## Quick start
 
@@ -11,8 +11,6 @@ This App will provides you the provision to add 2 differnt type of shipping rate
 3. You must create a store for testing if you don't have one, either a [development store](https://help.shopify.com/en/partners/dashboard/development-stores#create-a-development-store) or a [Shopify Plus sandbox store](https://help.shopify.com/en/partners/dashboard/managing-stores/plus-sandbox-store).
 
 ### Setup
-
-If you used the CLI to create the template, you can skip this section.
 
 Using yarn:
 
@@ -61,7 +59,7 @@ Local development is powered by [the Shopify CLI](https://shopify.dev/docs/apps/
 
 ### Application Storage
 
-This template uses [Prisma](https://www.prisma.io/) to store session data, by default using an [SQLite](https://www.sqlite.org/index.html) database.
+This App uses [Prisma](https://www.prisma.io/) to store session data, by default using an [SQLite](https://www.sqlite.org/index.html) database.
 The database is defined as a Prisma schema in `prisma/schema.prisma`.
 
 This use of SQLite works in production if your app runs as a single instance.
@@ -142,7 +140,7 @@ This only applies if you app is embedded, which it will be by default.
 
 ### Non Embedded
 
-Shopify apps are best when they are embedded into the Shopify Admin. This template is configured that way. If you have a reason to not embed your please make 2 changes:
+Shopify apps are best when they are embedded into the Shopify Admin. This App is configured that way. If you have a reason to not embed your please make 2 changes:
 
 1. Change the `isEmbeddedApp` prop to false for the `AppProvider` in `/app/routes/app.jsx`
 2. Remove any use of App Bridge APIs (`window.shopify`) from your code
@@ -171,29 +169,7 @@ Using pnpm:
 pnpm run deploy
 ```
 
-### My webhook subscriptions aren't being updated
 
-This template registers webhooks after OAuth completes, using the `afterAuth` hook when calling `shopifyApp`.
-The package calls that hook in 2 scenarios:
-- After installing the app
-- When an access token expires
-
-During normal development, the app won't need to re-authenticate most of the time, so the subscriptions aren't updated.
-
-To force your app to update the subscriptions, you can uninstall and reinstall it in your development store.
-That will force the OAuth process and call the `afterAuth` hook.
-
-### Admin created webhook failing HMAC validation
-
-Webhooks subscriptions created in the [Shopify admin](https://help.shopify.com/en/manual/orders/notifications/webhooks) will fail HMAC validation. This is because the webhook payload is not signed with your app's secret key.
-
-Create [webhook subscriptions]((https://shopify.dev/docs/api/shopify-app-remix/v1/guide-webhooks)) using the `shopifyApp` object instead.
-
-Test your webhooks with the [Shopify CLI](https://shopify.dev/docs/apps/tools/cli/commands#webhook-trigger) or by triggering events manually in the Shopify admin(e.g. Updating the product title to trigger a `PRODUCTS_UPDATE`).
-
-### First parameter has member 'readable' that is not a ReadableStream.
-
-See [hosting on Vercel](#hosting-on-vercel).
 
 ## Tech Stack
 
