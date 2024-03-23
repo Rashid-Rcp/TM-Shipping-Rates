@@ -1,14 +1,17 @@
-import { Page, Layout, Card, Text, TextField, Button, InlineStack,BlockStack, Divider } from "@shopify/polaris";
-import { useState, useCallback } from 'react';
+import { Layout, Card, Text, TextField, Button, InlineStack,BlockStack, Divider } from "@shopify/polaris";
+import { useState, useCallback, useEffect } from 'react';
+import { useNavigation } from "@remix-run/react";
 
 export default function AddZipCode(props) {
+
   const{ rates, submit } = props;
+  const nav = useNavigation();
 
   const [rate1, setRate1] = useState({
-    serviceName: rates ? (rates[0]?.service_name ?? null) : null,
+    serviceName: rates ? (rates[0]?.service_name ?? '') : '',
     serviceNameValid: rates ? (rates[0]?.service_name !== '' ? true : false) : false,
     serviceNameMessage: '',
-    serviceCode: rates ? (rates[0]?.service_code ?? null) : null,
+    serviceCode: rates ? (rates[0]?.service_code ?? '') : '',
     serviceCodeValid: rates ? (rates[0]?.service_code !== '' ? true : false) : false,
     serviceCodeMessage: '',
     pincodes: rates ? rates[0]?.pincodes.map(pin => pin.pincode).join(',') : '',
@@ -27,10 +30,10 @@ export default function AddZipCode(props) {
   });
   
   const [rate2, setRate2] = useState({
-    serviceName: rates ? (rates[1]?.service_name ?? null) : null,
+    serviceName: rates ? (rates[1]?.service_name ?? '') : '',
     serviceNameValid: rates ? (rates[1]?.service_name !== '' ? true : false) : false,
     serviceNameMessage: '',
-    serviceCode: rates ? (rates[1]?.service_code ?? null) : null,
+    serviceCode: rates ? (rates[1]?.service_code ?? '') : '',
     serviceCodeValid: rates ? (rates[1]?.service_code !== '' ? true : false) : false,
     serviceCodeMessage: '',
     pincodes: rates ? rates[1]?.pincodes.map(pin => pin.pincode).join(',') : '',
@@ -47,6 +50,12 @@ export default function AddZipCode(props) {
     priceMessage: '',
     id: rates ? (rates[1]?.id ?? '') : '',
   });
+
+  const[isLoading, setIsLoading] = useState(false);
+
+  useEffect(()=>{
+    nav.state !== 'idle' &&  setIsLoading(false);
+  },[nav]);
   
   const handleFieldChange = useCallback((setRate, fieldName, newValue) => {
 
@@ -70,10 +79,19 @@ export default function AddZipCode(props) {
     } else if (fieldName === 'price' && isNaN(newValue.trim())) {
       message = 'Price must be a number';
       isValid = false;
+    } else if (fieldName === 'currency' && !isValidCurrencyCode(newValue.trim())) {
+      message = 'Invalid currency code';
+      isValid = false;
     }
   
     return { isValid, message };
   };
+
+  const isValidCurrencyCode = (currencyCode) => {
+    const currencyCodeRegex = /^[A-Z]{3}$/;
+    return currencyCodeRegex.test(currencyCode);
+  };
+  
 
   const [formInvalidMessage, setFormInvalidMessage] = useState('');
 
@@ -115,7 +133,9 @@ export default function AddZipCode(props) {
       'pincodes': pincodes2,
       'total_price': rate2.price
     }
-    submit({ rate1: JSON.stringify(_rate1), rate2:JSON.stringify(_rate2), action:'update_rates' }, { method: "POST" })
+
+    submit({ rate1: JSON.stringify(_rate1), rate2:JSON.stringify(_rate2), action:'update_rates' }, { method: "POST" });
+    setIsLoading(true);
   };
 
   const doFormValidation = () => {
@@ -132,14 +152,14 @@ export default function AddZipCode(props) {
   }
 
   const isPincodeDuplicated = (pincodes1, pincodes2) => {
-    const pincodeArray1 = pincodes1.split(',').map(pincode => pincode.trim());
-    const pincodeArray2 = pincodes2.split(',').map(pincode => pincode.trim());
-    const pincodeSet1 = new Set(pincodeArray1);
-    const pincodeSet2 = new Set(pincodeArray2);
-    const duplicatedPincodes = [...pincodeSet1].filter(pincode => pincodeSet2.has(pincode));
-    const _pincodes1 = [...pincodeSet1].join(',');
-    const _pincodes2 = [...pincodeSet2].join(',');
-    return {pincodes1:_pincodes1 , pincodes2:_pincodes2, duplicated:duplicatedPincodes.join(',') };
+      const pincodeArray1 = pincodes1.split(',').map(pincode => pincode.trim());
+      const pincodeArray2 = pincodes2.split(',').map(pincode => pincode.trim());
+      const pincodeSet1 = new Set(pincodeArray1);
+      const pincodeSet2 = new Set(pincodeArray2);
+      const duplicatedPincodes = [...pincodeSet1].filter(pincode => pincodeSet2.has(pincode));
+      const _pincodes1 = [...pincodeSet1].join(',');
+      const _pincodes2 = [...pincodeSet2].join(',');
+      return {pincodes1:_pincodes1 , pincodes2:_pincodes2, duplicated:duplicatedPincodes.join(',') };
 };
 
   return (
@@ -152,14 +172,11 @@ export default function AddZipCode(props) {
                   <Text as="h2" variant="headingMd">
                    Provide Shipping rates.
                   </Text>
-                  
                 </BlockStack>
                 <BlockStack gap="200">
-                  
                   <Text as="h4" variant="headingMd">
                    Shipping Rates 1
                   </Text>
-
                   <TextField
                     label="Service Name"
                     value={rate1.serviceName}
@@ -167,7 +184,6 @@ export default function AddZipCode(props) {
                     autoComplete="off"
                     error={rate1.serviceNameMessage}
                   />
-
                   <TextField
                     label="Service Code"
                     value={rate1.serviceCode}
@@ -259,11 +275,12 @@ export default function AddZipCode(props) {
                   formInvalidMessage !== '' && (<p style={{color:'red'}}>{formInvalidMessage}</p>)
                 }
                 <InlineStack gap="300">
-                  <Button onClick={updateShippingRates}>
+                  <Button 
+                    loading={isLoading}
+                    onClick={updateShippingRates}>
                     Update Shipping Rates
                   </Button>
                 </InlineStack>
-               
               </BlockStack>
             </Card>
           </Layout.Section>

@@ -3,7 +3,7 @@
 client_id = "9d4266182f7a946804e9c9c943639200"
 name = "tm01"
 handle = "tm01"
-application_url = "https://observed-protection-syndicate-tanks.trycloudflare.com"
+application_url = "https://alfred-lp-locate-potential.trycloudflare.com"
 embedded = true
 
 [build]
@@ -17,9 +17,9 @@ scopes = "read_shipping,write_shipping"
 
 [auth]
 redirect_urls = [
-  "https://observed-protection-syndicate-tanks.trycloudflare.com/auth/callback",
-  "https://observed-protection-syndicate-tanks.trycloudflare.com/auth/shopify/callback",
-  "https://observed-protection-syndicate-tanks.trycloudflare.com/api/auth/callback"
+  "https://alfred-lp-locate-potential.trycloudflare.com/auth/callback",
+  "https://alfred-lp-locate-potential.trycloudflare.com/auth/shopify/callback",
+  "https://alfred-lp-locate-potential.trycloudflare.com/api/auth/callback"
 ]
 
 [webhooks]

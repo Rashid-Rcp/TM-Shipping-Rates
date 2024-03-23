@@ -1,29 +1,44 @@
 import { useState, useCallback, useEffect, memo } from 'react';
-import { Page, Layout, Card, Text, TextField, Button, InlineStack, Divider, BlockStack,Box } from "@shopify/polaris";
+import { Layout, Card, Text, TextField, Button, InlineStack, BlockStack,Box } from "@shopify/polaris";
+import { useNavigation } from "@remix-run/react";
 
 const RegisterShippingService = memo(
 
   function RegisterShippingService({ submit, shipping }) {
-
+    const nav = useNavigation();
     const [name, setName] = useState('');
     const [validationMessage, setValidationMessage] = useState('');
     const [ showDeleteWaring, setShowDeleteWaring ] = useState(false);
+    const [loadingAction, setLoadignAction] = useState('');
 
     useEffect(() => {
       setName(shipping[0]?.name || '');
       setShowDeleteWaring(false)
     }, [shipping]);
 
+    useEffect(()=>{
+      nav.state === 'idle' && setLoadignAction('');
+    },[nav]);
+
     const registerShipping = () => {
-        isValid(name) && submit({ name }, { method: "POST" });
+
+        if(isValid(name)){
+          submit({ name }, { method: "POST" });
+          setLoadignAction('register');
+        } 
     }
 
     const updateShipping = () => {
-        isValid(name) && submit({ name, id: shipping[0]?.id || null }, { method: "PUT" });
+        if(isValid(name)){
+          submit({ name, id: shipping[0]?.id || null }, { method: "PUT" });
+          setLoadignAction('update');
+
+        } 
     }
 
     const deleteShipping = () => {
         submit({ id: shipping[0]?.id || null }, { method: "DELETE" });
+        setLoadignAction('delete');
     }
 
     const showDeleteConfirm = () => {
@@ -38,7 +53,7 @@ const RegisterShippingService = memo(
             setValidationMessage('Shipping service name cant be empty');
             return false;
         }
-        return true
+        return true;
     }
 
     const handleChange = useCallback(
@@ -61,7 +76,6 @@ const RegisterShippingService = memo(
           <Card>
             <BlockStack gap="500">
               <Text as="h1" variant="headingMd">Register Shipping Services</Text>
-
               <TextField
                 label="Name"
                 value={name}
@@ -71,15 +85,25 @@ const RegisterShippingService = memo(
               />
               <InlineStack gap="400">
                 {shipping.length === 0 ? (
-                  <Button onClick={registerShipping}>
+                  <Button 
+                    onClick={registerShipping}
+                    loading = {loadingAction === 'register'}
+                  >
                     Register Shipping
                   </Button>
                 ) : (
                   <>
-                    <Button onClick={updateShipping}>
+                    <Button 
+                      onClick={updateShipping}
+                      loading= {loadingAction === 'update'}
+                    >
                       Update Shipping
                     </Button>
-                    <Button tone="critical" onClick={showDeleteConfirm}>
+                    <Button 
+                      tone="critical" 
+                      onClick={showDeleteConfirm}
+                      loading={loadingAction === 'delete'}
+                    >
                       Delete Shipping
                     </Button>
                   </>
@@ -87,7 +111,6 @@ const RegisterShippingService = memo(
               </InlineStack>
              { showDeleteWaring && (<DeleteWarning deleteShipping={deleteShipping} cancel={hideDeleteConfirm}/>) } 
             </BlockStack>
-
           </Card>
         </Layout.Section>
       </Layout>
