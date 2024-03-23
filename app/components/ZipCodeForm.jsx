@@ -32,8 +32,8 @@ export default function ZipCodeForm({setRate, rates}) {
     else if (newValue.trim() === '') {
       message = `${fieldName} can't be empty`;
       isValid = false;
-    } else if (fieldName === 'price' && isNaN(newValue.trim())) {
-      message = 'Price must be a number';
+    } else if (fieldName === 'price' && newValue < 0) {
+      message = 'Price must be greater than or equal to 0';
       isValid = false;
     } else if (fieldName === 'currency' && !isValidCurrencyCode(newValue.trim())) {
       message = 'Invalid currency code';
