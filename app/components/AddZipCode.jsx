@@ -131,15 +131,15 @@ const isDeliveryDaysValid = (rate1, rate2)=>{
     let isValid = true;
     let message = "";
     if(rate1.minDeliveryDays && rate1.maxDeliveryDays){
-      if(rate1.minDeliveryDays >= rate1.maxDeliveryDays){
+      if(rate1.minDeliveryDays > rate1.maxDeliveryDays){
         isValid = false;
-        message += "Min devilery days must lessthan max delivery date for shipping rate 1";
+        message += "Min devilery days can't be greater than Max deliveiry days for shipping rate 1";
       }
     }
     if(rate2.minDeliveryDays && rate2.maxDeliveryDays){
-      if(rate2.minDeliveryDays >= rate2.maxDeliveryDays){
+      if(rate2.minDeliveryDays > rate2.maxDeliveryDays){
         isValid = false;
-        message += "\n Min devilery days must lessthan max delivery date for shipping rate 2";
+        message += "\n Min devilery days can't be greater than Max deliveiry days for shipping rate 2";
       }
     }
     return{DeliveryDaysValid:isValid, message:message}
