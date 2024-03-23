@@ -54,7 +54,7 @@ Press P to open the URL to your app. Once you click install, you can start devel
 
 Local development is powered by [the Shopify CLI](https://shopify.dev/docs/apps/tools/cli). It logs into your partners account, connects to an app, provides environment variables, updates remote config, creates a tunnel and provides commands to generate extensions.
 
-### Shopiy CarrierService callback_rul
+### Shopify CarrierService callback_rul
 If the callback URL returns a 404 after restarting the Remix app, you can update the callback URL by uncommenting the 'callback_url' option on the 'PUT' method within the route's action for your local development.
 
 ```
