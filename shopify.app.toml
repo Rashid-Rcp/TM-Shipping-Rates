@@ -1,7 +1,7 @@
 # Learn more about configuring your app at https://shopify.dev/docs/apps/tools/cli/configuration
 
 client_id = "9d4266182f7a946804e9c9c943639200"
-name = "tm01"
+name = "TM Shipping Rates"
 handle = "tm01"
 application_url = "https://plug-boat-always-scientist.trycloudflare.com"
 embedded = true

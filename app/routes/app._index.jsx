@@ -1,6 +1,6 @@
 import { useEffect } from "react";
 import { json } from "@remix-run/node";
-import { useActionData, useLoaderData, useNavigation, useSubmit } from "@remix-run/react";
+import { useActionData, useLoaderData, useSubmit } from "@remix-run/react";
 import prisma from "../prisma";
 import { Page, BlockStack } from "@shopify/polaris";
 import { authenticate } from "../shopify.server";
@@ -194,7 +194,7 @@ export default function Index() {
 
   return (
     <Page>
-      <ui-title-bar title="Shipping Rate Manage" />
+      <ui-title-bar title="TM Shipping Rates" />
       <BlockStack gap="500">
         <RegisterShippingService shipping={shipping} submit={submit} />
         {
