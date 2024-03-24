@@ -2,9 +2,8 @@ import { useState, useCallback, useEffect, memo } from 'react';
 import { Layout, Card, Text, TextField, Button, InlineStack, BlockStack,Box } from "@shopify/polaris";
 import { useNavigation } from "@remix-run/react";
 
-const RegisterShippingService = memo(
-
-  function RegisterShippingService({ submit, shipping }) {
+const RegisterShippingService = memo(({ submit, shipping }) => {
+  
     const nav = useNavigation();
     const [name, setName] = useState('');
     const [validationMessage, setValidationMessage] = useState('');
