@@ -4,44 +4,55 @@ import { useCallback } from 'react';
 export default function ZipCodeForm({setRate, rates}) {
 
   const handleFieldChange = useCallback((setRate, fieldName, newValue) => {
-
-    let {isValid, message} = doFieldValidation(fieldName, newValue);
-    setRate(prevRate => ({
-      ...prevRate,
-      [fieldName]: newValue,
-      [`${fieldName}Valid`]: isValid,
-      [`${fieldName}Message`]: message,
-    }));
-
-  }, []);
+      let {isValid, message} = doFieldValidation(fieldName, newValue);
+      setRate(prevRate => ({
+        ...prevRate,
+        [fieldName]: newValue,
+        [`${fieldName}Valid`]: isValid,
+        [`${fieldName}Message`]: message,
+      }));
+    }, []);
 
   const doFieldValidation = (fieldName, newValue) => {
-    let isValid = true;
-    let message = '';
+      let isValid = true;
+      let message = '';
+      
+      switch(fieldName) {
+          case 'phoneRequired':
+              return { isValid, message };
   
-    if(fieldName === 'phoneRequired'){
-      return { isValid:isValid, message:message}
-    }
-    
-    if((fieldName === 'minDeliveryDays' || fieldName === 'maxDeliveryDays') ){
-        if(newValue !== '' && newValue < 1 ){
-          isValid = false;
-          message = "Delivery days must be a positive number";
-        }
-    }
-    else if (newValue.trim() === '') {
-      message = `${fieldName} can't be empty`;
-      isValid = false;
-    } else if (fieldName === 'price' && newValue < 0) {
-      message = 'Price must be greater than or equal to 0';
-      isValid = false;
-    } else if (fieldName === 'currency' && !isValidCurrencyCode(newValue.trim())) {
-      message = 'Invalid currency code';
-      isValid = false;
-    }
+          case 'minDeliveryDays':
+          case 'maxDeliveryDays':
+              if (newValue !== '' && newValue < 1) {
+                  isValid = false;
+                  message = "Delivery days must be a positive number";
+              }
+              break;
   
-    return { isValid:isValid, message:message };
+          case 'price':
+              if (newValue < 0) {
+                  message = 'Price must be greater than or equal to 0';
+                  isValid = false;
+              }
+              break;
+  
+          case 'currency':
+              if (!isValidCurrencyCode(newValue.trim())) {
+                  message = 'Invalid currency code';
+                  isValid = false;
+              }
+              break;
+  
+          default:
+              if (newValue.trim() === '') {
+                  message = `${fieldName} can't be empty`;
+                  isValid = false;
+              }
+      }
+  
+      return { isValid, message };
   };
+  
 
   const isValidCurrencyCode = (currencyCode) => {
     const currencyCodeRegex = /^[A-Z]{3}$/;
@@ -94,7 +105,6 @@ export default function ZipCodeForm({setRate, rates}) {
         autoComplete="off"
         error={rates.priceMessage}
       />
-      
     <TextField
         label="Min Delivery Days"
         type="number"

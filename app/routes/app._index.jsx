@@ -14,7 +14,7 @@ toastConfig({ theme: 'dark' });
 export const loader = async ({ request }) => {
 
   const { admin, session } = await authenticate.admin(request);
-  let response =  await admin.rest.resources.CarrierService.all({
+  let response = await admin.rest.resources.CarrierService.all({
     session: session,
   });
 
@@ -108,8 +108,8 @@ const shippingInsertRates = async (rates) => {
       description: rates.description,
       currency: rates.currency,
       phone_required: rates.phone_required,
-      max_delivery_days: rates.max_delivery_days!==''? Number(rates.max_delivery_days):null,
-      min_delivery_days: rates.min_delivery_days!==''? Number(rates.min_delivery_days):null,
+      max_delivery_days: rates.max_delivery_days !== '' ? Number(rates.max_delivery_days) : null,
+      min_delivery_days: rates.min_delivery_days !== '' ? Number(rates.min_delivery_days) : null,
       pincodes: {
         create: pincodeArray
       }
@@ -140,8 +140,8 @@ const shippingUpdateRates = async (rates) => {
       description: rates.description,
       currency: rates.currency,
       phone_required: rates.phone_required,
-      max_delivery_days: rates.max_delivery_days!==''?Number(rates.max_delivery_days):null,
-      min_delivery_days: rates.min_delivery_days!==''?Number(rates.min_delivery_days):null,
+      max_delivery_days: rates.max_delivery_days !== '' ? Number(rates.max_delivery_days) : null,
+      min_delivery_days: rates.min_delivery_days !== '' ? Number(rates.min_delivery_days) : null,
     }
   });
 

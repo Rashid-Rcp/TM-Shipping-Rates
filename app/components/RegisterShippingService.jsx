@@ -32,7 +32,6 @@ const RegisterShippingService = memo(
         if(isValid(name)){
           submit({ name, id: shipping[0]?.id || null }, { method: "PUT" });
           setLoadignAction('update');
-
         } 
     }
 
@@ -44,11 +43,12 @@ const RegisterShippingService = memo(
     const showDeleteConfirm = () => {
         setShowDeleteWaring(true);
     }
+
     const hideDeleteConfirm = () => {
         setShowDeleteWaring(false);
     }
-    const isValid = (name)=>{
 
+    const isValid = (name)=>{
         if(name.trim() === ''){
             setValidationMessage('Shipping service name cant be empty');
             return false;
