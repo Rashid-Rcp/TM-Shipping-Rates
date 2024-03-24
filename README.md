@@ -1,6 +1,7 @@
-# Shopify App For Custom shipping rates based on pincode 
+# TM Shipping Rates
 
-This app provides you with the ability to add two different types of shipping rates based on pin codes
+TM Shipping rates will provide you the option to add shipping rates based on pincodes. You can create two sets of shipping rates and their associated pincodes.
+The shipping rates will be calculated during the checkout based on the customer's entered address during the checkout process.
 
 ## Quick start
 
@@ -114,24 +115,6 @@ Using pnpm:
 
 ```shell
 pnpm run build
-```
-
-## Hosting
-
-When you're ready to set up your app in production, you can follow [our deployment documentation](https://shopify.dev/docs/apps/deployment/web) to host your app on a cloud provider like [Heroku](https://www.heroku.com/) or [Fly.io](https://fly.io/).
-
-When you reach the step for [setting up environment variables](https://shopify.dev/docs/apps/deployment/web#set-env-vars), you also need to set the variable `NODE_ENV=production`.
-
-### Hosting on Vercel
-
-When hosting your Shopify Remix app on Vercel, Vercel uses a fork of the [Remix library](https://github.com/vercel/remix).
-
-To  ensure all global variables are set correctly when you deploy your app to Vercel update your app to use the Vercel adapter instead of the node adapter.
-
-```diff
-// shopify.server.ts
-- import "@shopify/shopify-app-remix/adapters/node";
-+ import "@shopify/shopify-app-remix/adapters/vercel";
 ```
 
 ## Gotchas / Troubleshooting
