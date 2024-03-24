@@ -65,11 +65,11 @@ export const action = async ({ request }) => {
     }
 
     case "PUT": {
-      const callback_url = process.env.SHOPIFY_APP_URL + '/shipping_rates'
+     // const callback_url = process.env.SHOPIFY_APP_URL + '/shipping_rates'
       const carrier_service = new admin.rest.resources.CarrierService({session: session});
       carrier_service.id = body.get('id');
       carrier_service.name = body.get('name');
-      carrier_service.callback_url = callback_url;
+     // carrier_service.callback_url = callback_url;
       response = await carrier_service.save({
         update: true,
       });
