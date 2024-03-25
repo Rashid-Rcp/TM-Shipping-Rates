@@ -23,10 +23,13 @@ const ZipCodeForm = memo(({setRate, rates}) => {
     
             case 'minDeliveryDays':
             case 'maxDeliveryDays':
-                if (newValue !== '' && newValue < 1) {
-                    isValid = false;
-                    message = "Delivery days must be a positive number";
-                }
+              if (newValue !== '' && !Number.isInteger(Number(newValue))) {
+                isValid = false;
+                message = "Delivery days must be an integer";
+              } else if (newValue !== '' && Number(newValue) < 1) {
+                  isValid = false;
+                  message = "Delivery days must be a positive number";
+              }
                 break;
     
             case 'price':
